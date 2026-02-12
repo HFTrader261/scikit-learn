@@ -166,7 +166,7 @@ def _parallel_build_trees(
     if verbose > 1:
         print("building tree %d of %d" % (tree_idx + 1, n_trees))
 
-    if bootstrap or not (forest.sampling_function is None):
+    if bootstrap or sampling_function is not None:
         n_samples = X.shape[0]
         if sample_weight is None:
             curr_sample_weight = np.ones((n_samples,), dtype=np.float64)
