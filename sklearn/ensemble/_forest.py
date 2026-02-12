@@ -159,6 +159,7 @@ def _parallel_build_trees(
     class_weight=None,
     n_samples_bootstrap=None,
     missing_values_in_feature_mask=None,
+    sampling_function=None,
 ):
     """
     Private function used to fit a single tree in parallel."""
@@ -172,12 +173,11 @@ def _parallel_build_trees(
         else:
             curr_sample_weight = sample_weight.copy()
 
-        if forest.sampling_function is None:
+        if sampling_function is None:  
             indices = _generate_sample_indices(tree.random_state, n_samples, n_samples_bootstrap)
-
         else:
             random_instance = check_random_state(tree.random_state)
-            indices = forest.sampling_function(random_instance, n_samples, n_samples_bootstrap)
+            indices = sampling_function(random_instance, n_samples, n_samples_bootstrap)
 
         sample_counts = np.bincount(indices, minlength=n_samples)
         curr_sample_weight *= sample_counts
@@ -506,6 +506,7 @@ class BaseForest(MultiOutputMixin, BaseEnsemble, metaclass=ABCMeta):
                     class_weight=self.class_weight,
                     n_samples_bootstrap=n_samples_bootstrap,
                     missing_values_in_feature_mask=missing_values_in_feature_mask,
+                    sampling_function=self.sampling_function
                 )
                 for i, t in enumerate(trees)
             )
